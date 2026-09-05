@@ -31,6 +31,12 @@ button {
   border: 1px solid #cc0;
   padding: 10px;
 }
+img {
+  max-width: 100%;
+  width: 300px;
+  border: 1px solid #ccc;
+  margin: 10px 0;
+}
 </style>
 </head>
 <body>
@@ -50,6 +56,8 @@ to reset that counter back to 100%.
 Made for the Xiaomi Mi Air Purifier 4. Should also work on the 2S, 3H,
 Pro, Pro H, Elite, 4 Lite and 4 Pro since they use the same tag.
 </p>
+<img src="images/purifier.png" alt="Xiaomi Mi Air Purifier 4">
+<img src="images/filter.png" alt="Xiaomi Mi Air Purifier 4 filter with NFC tag">
 
 <h2>Generate the reset code</h2>
 <p>Enter the 14 character UID from the filter's NFC tag:</p>
@@ -62,10 +70,12 @@ Pro, Pro H, Elite, 4 Lite and 4 Pro since they use the same tag.
 <ol>
 <li>Install the free NFC Tools app from the Play Store.</li>
 <li>Open the app, tap Read, and hold the phone on the filter's tag.
-Write down the UID / Serial number shown (14 hex characters).</li>
+Write down the UID / Serial number shown (14 hex characters).
+<br><img src="images/nfc-read.avif" alt="NFC Tools Read screen showing the tag UID"></li>
 <li>Type the UID into the box above and press Generate.</li>
 <li>In NFC Tools go to Other, then Advanced NFC commands, and accept
-the warning.</li>
+the warning.
+<br><img src="images/advanced-nfc-commands.png" alt="NFC Tools Advanced NFC commands screen"></li>
 <li>Set the I/O class to NfcA (ISO 14443-3A).</li>
 <li>Paste in the whole reset command that was generated.</li>
 <li>Hold the phone on the tag again and press Send command.</li>
