@@ -12,10 +12,8 @@ how dirty the filter is. So the Mi Home app will keep nagging you to buy a
 new filter even if yours is still perfectly fine. This lets you reset the
 counter on a filter you've checked out and are happy to keep using.
 
-Not official, not affiliated with Xiaomi. It's built off reverse engineering
-work done by [Unethical Info](https://unethical.info/2024/01/24/hacking-my-air-purifier/)
-and Flamingo-tech. Same tag scheme is used on the 2S, 3H, Pro, Pro H, Elite,
-4 Lite and 4 Pro too, so it should work on those as well.
+Same tag scheme is used on the 2S, 3H, Pro, Pro H, Elite, 4 Lite and 4 Pro
+too, so it should work on those as well.
 
 ## How it works
 
