@@ -146,12 +146,93 @@
     color: var(--muted);
   }
   footer a { color: inherit; }
+
+  .intro, .guide {
+    width: 100%;
+    max-width: 460px;
+    margin-bottom: 20px;
+  }
+  .intro h2, .guide h2 {
+    font-size: 1rem;
+    margin: 0 0 8px;
+  }
+  .intro p, .guide p {
+    margin: 0 0 10px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .intro ul {
+    margin: 0 0 10px;
+    padding-left: 20px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .guide ol {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .guide li { margin-bottom: 8px; }
+  .guide code {
+    background: var(--mono-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.85em;
+  }
+  .warning {
+    max-width: 460px;
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--error);
+    color: var(--error);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    background: color-mix(in srgb, var(--error) 8%, transparent);
+  }
+  .stack { display: flex; flex-direction: column; align-items: center; }
 </style>
 </head>
 <body>
+<div class="stack">
+
+  <div class="intro">
+    <h2>What this does</h2>
+    <p>
+      Xiaomi air purifier filters have an NFC tag that the Mi Home app reads
+      to track "remaining life." This tool generates the password and
+      command needed to reset that counter back to 100%, using only the
+      filter's UID — nothing is sent over the network, everything runs
+      locally in your browser.
+    </p>
+    <h2>Why</h2>
+    <p>
+      The tag's countdown is based on elapsed time, not actual filter
+      condition, so the app often demands a replacement long before the
+      filter is actually saturated. This lets you reset the counter for a
+      filter you've inspected (and optionally cleaned) and judged still
+      good, cutting down on unnecessary replacements and waste.
+    </p>
+    <h2>Compatible devices</h2>
+    <p>
+      Built for the <strong>Xiaomi Mi Air Purifier 4</strong> filter. The
+      same NFC-tag scheme is also used on other models in the line (2S,
+      3H, Pro, Pro H, Elite, 4 Lite, 4 Pro), so this should work for those
+      too. This is an unofficial, community reverse-engineered method
+      (credit to <a href="https://unethical.info/2024/01/24/hacking-my-air-purifier/" target="_blank" rel="noopener">Unethical Info</a>
+      and Flamingo-tech) — not affiliated with or supported by Xiaomi, so
+      results can vary by model/filter revision.
+    </p>
+  </div>
+
   <div class="card">
     <h1>Xiaomi Filter Reset</h1>
-    <p class="sub">Enter the 14-character UID printed on your Xiaomi water filter's NFC tag to generate the reset code and command.</p>
+    <p class="sub">Enter the 14-character UID read from your filter's NFC tag to generate the reset code and command.</p>
 
     <form id="form">
       <label for="uid">Filter UID</label>
@@ -177,12 +258,36 @@
         </div>
       </div>
     </div>
-
-    <footer>
-      Runs entirely in your browser — no data is sent anywhere.
-      <br><a href="https://github.com/IbbyHere/Xiaomi-Filter-Reset" target="_blank" rel="noopener">View source on GitHub</a>
-    </footer>
   </div>
+
+  <div class="guide">
+    <h2>Flashing the tag (Android + NFC Tools)</h2>
+    <ol>
+      <li>Install the free <strong>NFC Tools</strong> app (by wakdev) from the Play Store on an NFC-capable Android phone.</li>
+      <li>Open NFC Tools, tap <strong>Read</strong>, then hold your phone against the filter's NFC tag until it scans. Note the <strong>UID / Serial number</strong> shown (14 hex characters).</li>
+      <li>Paste that UID into the field above and click <strong>Generate</strong> to get your reset command.</li>
+      <li>In NFC Tools, go to <strong>Other &gt; Advanced NFC commands</strong>, then tap <strong>accept</strong> on the warning.</li>
+      <li>Set the I/O class to <code>NfcA (ISO 14443-3A)</code>.</li>
+      <li>Paste the generated <strong>reset command</strong> (the whole string, e.g. <code>1B...,3008,A20800000000</code>) into the data box.</li>
+      <li>Hold your phone against the filter's tag again and tap <strong>Send command</strong>.</li>
+      <li>Reopen the Mi Home app — the filter should now show 100% remaining life.</li>
+    </ol>
+  </div>
+
+  <div class="warning">
+    Only do this for a filter you've physically checked and believe is
+    still good — this resets the app's counter, it doesn't clean or
+    extend the physical filter itself. Writing raw commands to an NFC tag
+    carries a small risk of a failed/incomplete write; proceed at your own
+    risk.
+  </div>
+
+  <footer style="margin-top:0;">
+    Runs entirely in your browser — no data is sent anywhere.
+    <br><a href="https://github.com/IbbyHere/Xiaomi-Filter-Reset" target="_blank" rel="noopener">View source on GitHub</a>
+  </footer>
+
+</div>
 
 <script>
 async function generateCode(rawUid) {
