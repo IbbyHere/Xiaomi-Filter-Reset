@@ -1,6 +1,39 @@
 import hashlib
 import re
 
+# Xiaomi Filter Reset
+#
+# What this is:
+# The filter's NFC tag counts down on a timer, it does not actually check
+# how dirty the filter is. So the Mi Home app keeps telling you to buy a
+# new filter even when it is still fine. This script generates the code
+# needed to reset that counter back to 100%.
+#
+# What it's for:
+# Made for the Xiaomi Mi Air Purifier 4. Should also work on the 2S, 3H,
+# Pro, Pro H, Elite, 4 Lite and 4 Pro since they use the same tag.
+#
+# How to use this script:
+# 1. Run this script (python main.py) and enter the filter's 14 character
+#    UID when asked. It will print a "Code" and a "Reset command".
+#
+# How to flash the tag (Android + NFC Tools app):
+# 1. Install the free NFC Tools app from the Play Store.
+# 2. Open the app, tap Read, and hold the phone on the filter's tag.
+#    Write down the UID / Serial number shown (14 hex characters).
+# 3. Enter that UID into this script to get the reset command.
+# 4. In NFC Tools go to Other, then Advanced NFC commands, and accept
+#    the warning.
+# 5. Set the I/O class to NfcA (ISO 14443-3A).
+# 6. Paste in the whole reset command that this script printed out.
+# 7. Hold the phone on the tag again and press Send command.
+# 8. Open the Mi Home app, the filter should now show 100%.
+#
+# Disclaimer:
+# Only do this on a filter that has been checked and is still ok to use.
+# This only resets what the app says, it does not clean the filter.
+# Writing to the tag could fail sometimes, so do this at your own risk.
+
 
 def generate_code(uid):
     # Remove spaces and other characters from the UID
