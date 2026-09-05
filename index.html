@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xiaomi Filter Reset</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --text: #1a1d21;
+    --muted: #6b7280;
+    --border: #e2e5e9;
+    --accent: #ff6900;
+    --accent-hover: #e65c00;
+    --error: #d92d20;
+    --mono-bg: #f0f1f3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16181c;
+      --card: #1f2229;
+      --text: #eef0f2;
+      --muted: #9aa1ab;
+      --border: #30343c;
+      --accent: #ff8a3d;
+      --accent-hover: #ffa565;
+      --error: #f97066;
+      --mono-bg: #14161a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    width: 100%;
+    max-width: 460px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  h1 {
+    font-size: 1.4rem;
+    margin: 0 0 4px;
+  }
+  p.sub {
+    color: var(--muted);
+    margin: 0 0 24px;
+    font-size: 0.92rem;
+    line-height: 1.4;
+  }
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--mono-bg);
+    color: var(--text);
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 1rem;
+    letter-spacing: 0.03em;
+    outline: none;
+  }
+  input[type="text"]:focus {
+    border-color: var(--accent);
+  }
+  button {
+    width: 100%;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:hover { background: var(--accent-hover); }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .result {
+    margin-top: 24px;
+    display: none;
+  }
+  .result.visible { display: block; }
+  .field {
+    margin-bottom: 14px;
+  }
+  .field .row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .field .value {
+    flex: 1;
+    padding: 10px 12px;
+    background: var(--mono-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.95rem;
+    word-break: break-all;
+  }
+  .copy-btn {
+    width: auto;
+    margin-top: 0;
+    padding: 10px 12px;
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .copy-btn:hover { background: var(--mono-bg); }
+
+  .error {
+    margin-top: 16px;
+    color: var(--error);
+    font-size: 0.9rem;
+    display: none;
+  }
+  .error.visible { display: block; }
+
+  footer {
+    margin-top: 28px;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Xiaomi Filter Reset</h1>
+    <p class="sub">Enter the 14-character UID printed on your Xiaomi water filter's NFC tag to generate the reset code and command.</p>
+
+    <form id="form">
+      <label for="uid">Filter UID</label>
+      <input type="text" id="uid" placeholder="e.g. 04A1B2C3D4E5F6" autocomplete="off" spellcheck="false">
+      <button type="submit">Generate</button>
+    </form>
+
+    <div class="error" id="error"></div>
+
+    <div class="result" id="result">
+      <div class="field">
+        <label>Code</label>
+        <div class="row">
+          <div class="value" id="codeValue"></div>
+          <button class="copy-btn" type="button" data-copy="codeValue">Copy</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Reset command</label>
+        <div class="row">
+          <div class="value" id="commandValue"></div>
+          <button class="copy-btn" type="button" data-copy="commandValue">Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Runs entirely in your browser — no data is sent anywhere.
+      <br><a href="https://github.com/IbbyHere/Xiaomi-Filter-Reset" target="_blank" rel="noopener">View source on GitHub</a>
+    </footer>
+  </div>
+
+<script>
+async function generateCode(rawUid) {
+  const uid = rawUid.replace(/[^0-9A-Fa-f]/g, "");
+
+  if (uid.length !== 14) {
+    throw new Error("The UID must contain 14 hexadecimal characters.");
+  }
+
+  const bytes = new Uint8Array(uid.length / 2);
+  for (let i = 0; i < uid.length; i += 2) {
+    bytes[i / 2] = parseInt(uid.substr(i, 2), 16);
+  }
+
+  const hashBuffer = await crypto.subtle.digest("SHA-1", bytes);
+  const hash = new Uint8Array(hashBuffer);
+
+  const start = hash[0];
+  const positions = [
+    start % 20,
+    (start + 5) % 20,
+    (start + 13) % 20,
+    (start + 17) % 20
+  ];
+
+  return positions
+    .map((p) => hash[p].toString(16).toUpperCase().padStart(2, "0"))
+    .join("");
+}
+
+const form = document.getElementById("form");
+const uidInput = document.getElementById("uid");
+const errorEl = document.getElementById("error");
+const resultEl = document.getElementById("result");
+const codeValueEl = document.getElementById("codeValue");
+const commandValueEl = document.getElementById("commandValue");
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  errorEl.classList.remove("visible");
+  resultEl.classList.remove("visible");
+
+  try {
+    const code = await generateCode(uidInput.value);
+    const command = `1B${code},3008,A20800000000`;
+
+    codeValueEl.textContent = code;
+    commandValueEl.textContent = command;
+    resultEl.classList.add("visible");
+  } catch (err) {
+    errorEl.textContent = err.message;
+    errorEl.classList.add("visible");
+  }
+});
+
+document.querySelectorAll(".copy-btn").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    const targetId = btn.getAttribute("data-copy");
+    const text = document.getElementById(targetId).textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+      const original = btn.textContent;
+      btn.textContent = "Copied!";
+      setTimeout(() => { btn.textContent = original; }, 1200);
+    } catch (err) {
+      /* clipboard API unavailable; ignore */
+    }
+  });
+});
+</script>
+</body>
+</html>
